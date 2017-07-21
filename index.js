@@ -19,5 +19,5 @@ app.use('/graphiql', graphiqlExpress({
 }));
 
 app.listen(GQL_PORT, () => console.log(
-    `GraphQL is now running on localhost:${GQL_PORT}/graphiql`
+    `GraphQL is now running on localhost:${GQL_PORT}/graphql`
 )); 

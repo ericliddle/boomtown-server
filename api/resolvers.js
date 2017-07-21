@@ -8,7 +8,7 @@ const resolveFunctions = {
                 .catch(errors => console.log(errors));
         },
         user(root, { id }) {
-            return fetch(`http://localhost:3001/users${id}`)
+            return fetch(`http://localhost:3001/users/${id}`)
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
         },
@@ -18,7 +18,7 @@ const resolveFunctions = {
                 .catch(errors => console.log(errors));
         },
         item(root, { id }) {
-            return fetch(`http://localhost:3001/items${id}`)
+            return fetch(`http://localhost:3001/items/${id}`)
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
         }
@@ -26,12 +26,13 @@ const resolveFunctions = {
 
     Item: {
         itemOwner(item) {
-            return fetch(`http://localhost:3001/users${item.itemOwner}`)
+            return fetch(`http://localhost:3001/users/${item.itemOwner}`)
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
         },
         borrower(item) {
-            return fetch(`http://localhost:3001/users${item.borrower}`)
+            if (!item.borrower) return null
+            return fetch(`http://localhost:3001/users/${item.borrower}`)
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
         }
@@ -48,7 +49,33 @@ const resolveFunctions = {
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
         }
+    },
+
+    Mutation: {
+        addNewItem(root, args) {
+            const newItem = {
+                title: args.title,
+                imageUrl: args.imageUrl,
+                itemOwner: args.itemOwner,
+                description: args.description,
+                tags: args.tags,
+                // createdOn: +new Date,
+                createdOn: Math.floor(Date.now() / 1000),
+                available: true,
+                borrower: null
+            }
+
+            return fetch('http://localhost:3001/items/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newItem)
+            })
+                .then(response => response.json())
+                .catch(errors => console.log(errors));
+        }
     }
 };
 
-export default resolveFunctions
+export default resolveFunctions;
