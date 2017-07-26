@@ -1,53 +1,41 @@
 import fetch from 'node-fetch';
+import { getUser, getAllItems, getItem, getItemOwner, getBorrower, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
+import pool from '../database/index';
+import { getUsers } from './postgresDB';
 
 const resolveFunctions = {
     Query: {
         users() {
-            return fetch(`http://localhost:3001/users`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+            return getUsers()
         },
-        user(root, { id }) {
-            return fetch(`http://localhost:3001/users/${id}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+
+        user: (root, { id }, context) => {
+            return context.loaders.getUser.load(id)
         },
         items() {
-            return fetch(`http://localhost:3001/items`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+            return getAllItems()
         },
-        item(root, { id }) {
-            return fetch(`http://localhost:3001/items/${id}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+        item: (root, { id }, context) => {
+            return context.loaders.getItem.load(id)
         }
     },
 
     Item: {
         itemOwner(item) {
-            return fetch(`http://localhost:3001/users/${item.itemOwner}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+            return getUser(item.itemOwner)
         },
         borrower(item) {
             if (!item.borrower) return null
-            return fetch(`http://localhost:3001/users/${item.borrower}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+            return getUser(item.borrower)
         }
     },
 
     User: {
-        items(user) {
-            return fetch(`http://localhost:3001/items/?itemOwner=${user.id}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+        items: (user, args, context) => {
+            return context.loaders.getItemsShared.load(user.id)
         },
-        borrowed(user) {
-            return fetch(`http://localhost:3001/items/?borrower=${user.id}`)
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+        borrowed: (user, args, context) => {
+            return context.loaders.getBorrowed.load(id)
         }
     },
 
@@ -59,7 +47,6 @@ const resolveFunctions = {
                 itemOwner: args.itemOwner,
                 description: args.description,
                 tags: args.tags,
-                // createdOn: +new Date,
                 createdOn: Math.floor(Date.now() / 1000),
                 available: true,
                 borrower: null

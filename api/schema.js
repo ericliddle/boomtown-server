@@ -4,14 +4,6 @@ import resolvers from './resolvers'
 // TODO: Add date string of time date + time in mutation
 
 const typeDefs = `
-    type User {
-        id: ID!
-        fullName: String!
-        email: String!
-        bio: String
-        items: [Item]
-        borrowed: [Item]
-    }
 
     type Item {
         id: ID!
@@ -25,6 +17,17 @@ const typeDefs = `
         borrower: User
     }
 
+    type User {
+        id: String!
+        fullName: String!
+        email: String!
+        bio: String
+        items: [Item]
+        borrowed: [Item]
+    }
+
+    # the schema allows the following queries:
+
     type Query {
         users: [User]
         user(id: ID!): User
@@ -32,14 +35,15 @@ const typeDefs = `
         item(id: ID!): Item
     },
 
+    # this schema allows for the following mutations:
+
     type Mutation {
         addNewItem(
-            title: String
+            title: String!
             imageUrl: String
-            itemOwner: ID              
-            description: String
-            tags: [String]
-                   
+            itemOwner: ID!              
+            description: String!
+            tags: [String!]
             available: Boolean
             borrower: ID    
         ): Item
