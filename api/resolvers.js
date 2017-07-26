@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import { getUser, getAllItems, getItem, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
 import pool from '../database/index';
 import { getUsers } from './postgresDB';
+import { createUser } from './postgresDB';
 
 const resolveFunctions = {
     Query: {
@@ -61,8 +62,12 @@ const resolveFunctions = {
             })
                 .then(response => response.json())
                 .catch(errors => console.log(errors));
+        },
+            addUser: (root, args, context) => {
+            return createUser(args, context)
         }
     }
+
 };
 
 export default resolveFunctions;

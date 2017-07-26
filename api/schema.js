@@ -19,7 +19,7 @@ const typeDefs = `
 
     type User {
         id: ID!
-        fullName: String!
+        fullname: String!
         email: String!
         bio: String
         items: [Item]
@@ -47,6 +47,13 @@ const typeDefs = `
             available: Boolean
             borrower: ID    
         ): Item
+
+        addUser(
+            fullname: String!
+            email: String!
+            bio: String
+            password: String!
+        ): User
     }
 
 `;

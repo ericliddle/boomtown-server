@@ -8,6 +8,7 @@ import {
 import cors from 'cors';
 import schema from './api/schema';
 import createLoaders from './api/loaders';
+import admin from './database/firebase';
 
 const GQL_PORT = 4400;
 const PORT = process.env.PORT;
@@ -18,19 +19,38 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(root))
     app.use(fallback('index.html', { root }))
 } else {
-    app.use('*', cors({origin: 'http://localhost3000'}));
+    // app.use('*', cors({ origin: 'http://localhost3000' }));
 }
 
 app.use('*', cors());
 
+app.use(bodyParser.json());
+
+
 app.use('/graphql', (req, res, next) => {
-    //TODO: Add Firebase token validation
-    next()
+    const { operationName, variables } = req.body
+    if (operationName && operationName === 'addUser') {
+        admin.auth().createCustomToken(variables.email).then(function (token) {
+            req.body.token = token;
+            next()
+        }).catch(function (error) {
+            console.log(error)
+        })
+    } else {
+        next()
+    }
 });
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({
-    schema,
-    context: { loaders: createLoaders()}
+app.use('/graphql', graphqlExpress(function (req, res) {
+    return {
+        schema,
+        context:
+        {
+            loaders: createLoaders(),
+            token: req.body.token,
+            response: res
+        }
+    }
 }));
 
 console.log(process.env)
