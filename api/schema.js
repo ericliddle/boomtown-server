@@ -18,7 +18,7 @@ const typeDefs = `
     }
 
     type User {
-        id: String!
+        id: ID!
         fullName: String!
         email: String!
         bio: String

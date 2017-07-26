@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { getUser, getAllItems, getItem, getItemOwner, getBorrower, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
+import { getUser, getAllItems, getItem, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
 import pool from '../database/index';
 import { getUsers } from './postgresDB';
 
