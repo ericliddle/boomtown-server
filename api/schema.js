@@ -58,9 +58,6 @@ const typeDefs = `
 
 `;
 
-//  TODO: place between open slot between tags and available - createdOn: Int! 
-
-
 export default makeExecutableSchema({
     typeDefs,
     resolvers

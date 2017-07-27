@@ -26,34 +26,17 @@ app.use('*', cors());
 
 app.use(bodyParser.json());
 
-
-app.use('/graphql', (req, res, next) => {
-    const { operationName, variables } = req.body
-    if (operationName && operationName === 'addUser') {
-        admin.auth().createCustomToken(variables.email).then(function (token) {
-            req.body.token = token;
-            next()
-        }).catch(function (error) {
-            console.log(error)
-        })
-    } else {
-        next()
-    }
-});
-
-app.use('/graphql', graphqlExpress(function (req, res) {
+app.use('/graphql', graphqlExpress(function (req, res, next) {
     return {
         schema,
         context:
         {
             loaders: createLoaders(),
-            token: req.body.token,
-            response: res
         }
     }
 }));
-
 console.log(process.env)
+
 app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql'
 }));
