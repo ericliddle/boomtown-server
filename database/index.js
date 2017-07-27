@@ -4,7 +4,7 @@ const pool = new Pool({
     host: 'localhost',
     //TODO: Might not need this
     // After commenting this out it now postgres now times out
-    // user: 'ericl',
+    user: 'dbdemo',
     max: 20,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,

@@ -1,29 +1,30 @@
 import fetch from 'node-fetch';
 
 
-export function getUsers() {
-    return fetch(`http://localhost:3001/users`)
-        .then(response => response.json())
-        .catch(errors => console.log(errors));
-};
+// export function getUsers() {
+//     return fetch(`http://localhost:3001/users`)
+//         .then(response => response.json())
+//         .catch(errors => console.log(errors));
+// };
 
 
-export function getUser(id) {
-    return fetch(`http://localhost:3001/users/${id}`)
-        .then(response => response.json())
-        .catch(errors => console.log(errors));
-};
+// export function getUser(id) {
+//     return fetch(`http://localhost:3001/users/${id}`)
+//         .then(response => response.json())
+//         .catch(errors => console.log(errors));
+// };
 
-export function getAllItems() {
-    return fetch(`http://localhost:3001/items`)
-        .then(response => response.json())
-        .catch(errors => console.log(errors));
-};
-export function getItem(id) {
-    return fetch(`http://localhost:3001/items/${id}`)
-        .then(response => response.json())
-        .catch(errors => console.log(errors));
-};
+// export function getAllItems() {
+//     return fetch(`http://localhost:3001/items`)
+//         .then(response => response.json())
+//         .catch(errors => console.log(errors));
+// };
+
+// export function getItem(id) {
+//     return fetch(`http://localhost:3001/items/${id}`)
+//         .then(response => response.json())
+//         .catch(errors => console.log(errors));
+// };
 
 export function getItemsShared(user) {
     return fetch(`http://localhost:3001/items/?itemOwner=${user}`)
@@ -43,7 +44,7 @@ export function addNewItem(root, args) {
         itemOwner: args.itemOwner,
         description: args.description,
         tags: args.tags,
-        createdOn: Math.floor(Date.now() / 1000),
+        created: Math.floor(Date.now() / 1000),
         available: true,
         borrower: null
     }

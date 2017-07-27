@@ -1,8 +1,7 @@
 import fetch from 'node-fetch';
-import { getUser, getAllItems, getItem, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
+import { getUser, getItem, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
 import pool from '../database/index';
-import { getUsers } from './postgresDB';
-import { createUser } from './postgresDB';
+import { getUsers, getItems, createUser  } from './postgresDB';
 
 const resolveFunctions = {
     Query: {
@@ -14,7 +13,7 @@ const resolveFunctions = {
             return context.loaders.getUser.load(id)
         },
         items() {
-            return getAllItems()
+            return getItems()
         },
         item: (root, { id }, context) => {
             return context.loaders.getItem.load(id)
@@ -48,7 +47,7 @@ const resolveFunctions = {
                 itemOwner: args.itemOwner,
                 description: args.description,
                 tags: args.tags,
-                createdOn: Math.floor(Date.now() / 1000),
+                created: Math.floor(Date.now() / 1000),
                 available: true,
                 borrower: null
             }
