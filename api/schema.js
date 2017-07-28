@@ -7,11 +7,11 @@ const typeDefs = `
 
     type Item {
         id: ID!
-        title: String
+        title: String!
         description: String!
-        imageUrl: String
-        tags: [String]
-        itemOwner: User!
+        imageurl: String
+        tags: [Tag!]
+        itemowner: User!
         created: Int!        
         available: Boolean!
         borrower: User
@@ -26,6 +26,15 @@ const typeDefs = `
         borrowed: [Item]
     }
 
+    input AssignedTag {
+        id: Int! 
+    }
+
+    type Tag {
+        id: Int!
+        title: String!
+    }
+
     # the schema allows the following queries:
 
     type Query {
@@ -33,19 +42,19 @@ const typeDefs = `
         user(id: ID!): User
         items: [Item]
         item(id: ID!): Item
+        tags: [Tag]
+        tag(id: ID!): Tag
     },
 
     # this schema allows for the following mutations:
 
     type Mutation {
-        addNewItem(
+        addItem(
             title: String!
-            imageUrl: String
-            itemOwner: ID!              
+            imageurl: String
+            itemowner: ID!              
             description: String!
-            tags: [String!]
-            available: Boolean
-            borrower: ID    
+            tags: [AssignedTag]!
         ): Item
 
         addUser(

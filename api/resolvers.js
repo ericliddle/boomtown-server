@@ -1,7 +1,11 @@
 import fetch from 'node-fetch';
-import { getUser, getItem, getItemsShared, getBorrowed, addNewItem } from './jsonServer';
 import pool from '../database/index';
-import { getUsers, getItems, createUser  } from './postgresDB';
+import {
+    getUser, getUsers, newItem, getItem,
+    getItems, getItemsShared, getBorrowed,
+    createUser, getTags, getTagsFromItem,
+    getItemsFromTags,
+} from './postgresDB';
 
 const resolveFunctions = {
     Query: {
@@ -21,8 +25,12 @@ const resolveFunctions = {
     },
 
     Item: {
-        itemOwner(item) {
-            return getUser(item.itemOwner)
+        tags: (item) => {
+        return getTagsFromItem(item.id);
+        },
+
+        itemowner(item, args, context) {
+            return context.loader.getUser.load(item.itemowner)
         },
         borrower(item) {
             if (!item.borrower) return null
@@ -40,33 +48,13 @@ const resolveFunctions = {
     },
 
     Mutation: {
-        addNewItem(root, args) {
-            const newItem = {
-                title: args.title,
-                imageUrl: args.imageUrl,
-                itemOwner: args.itemOwner,
-                description: args.description,
-                tags: args.tags,
-                created: Math.floor(Date.now() / 1000),
-                available: true,
-                borrower: null
-            }
-
-            return fetch('http://localhost:3001/items/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newItem)
-            })
-                .then(response => response.json())
-                .catch(errors => console.log(errors));
+        addItem(root, args) {
+            return newItem(args)
         },
-            addUser: (root, args, context) => {
+        addUser: (root, args, context) => {
             return createUser(args, context)
         }
     }
-
 };
 
 export default resolveFunctions;

@@ -11,16 +11,14 @@ export function getItems() {
 };
 
 export function getItem(id) {
-    return new Promise(async (res, rej) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            let user = await pool.query(`SELECT * FROM items WHERE itemid='${id}'`)
-            const fbuser = await admin.auth().gerUser(id)
-            user = renameId(user)[0];
-            user = { ...user, email: fbuser.email };
-            res(user);
+            let item = await pool.query(`SELECT * FROM items WHERE id = '${id}'`)
+            item = (item.rows)[0];
+            resolve(item);
         } catch (error) {
             console.log(error);
-            rej(error);
+            reject(error);
         }
     })
 };
@@ -28,28 +26,26 @@ export function getItem(id) {
 export const getUsers = () => {
     return pool.query(`SELECT * from user_profiles`)
         .then(response => {
-            return renameId(response.rows);
-        })
-        .catch(errors => { console.log(errors) })
+            return response.rows;
+        }).catch(errors => console.log(errors))
 }
 
 export function getUser(id) {
-    return new Promise(async (res, rej) => {
+    return new Promise(async (resolve, reject) => {
         try {
-            let user = await pool.query(`SELECT * FROM user_profiles WHERE userid = ${id}`)
+            let user = await pool.query(`SELECT * FROM user_profiles WHERE id = ${id}`)
             const fbuser = await admin.auth().gerUser(id)
-            user = renameId(user)[0];
             user = { ...user, email: fbuser.email };
-            res(user);
+            resolve(user);
         } catch (error) {
             console.log(error);
-            rej(error);
+            reject(error);
         }
     })
 };
 
 export function getItemsShared(id) {
-    return pool.query(`SELECT * from items WHERE itemOwner = ${id}`)
+    return pool.query(`SELECT * from items WHERE itemowner = '${id}'`)
         .then(response => {
             return response.rows
         }).catch(errors => console.log(errors));
@@ -63,19 +59,27 @@ export function getBorrowed(id) {
         }).catch(errors => console.log(errors));
 };
 
-export function getTags(itemId) {
-    return pool.query(`SELECT * FROM tags 
-                        INNER JOIN itemtags 
-                        ON tags.id = itemtags.itemid 
-                        WHERE itemtags.itemid = ${itemId}`
+export function getTags() {
+    return pool.query(`SELECT * FROM tags`)
+        .then(response => response.rows)
+        .catch(errors => console.log(errors));
+}
+
+export function getTagsFromItem(id) {
+    return pool.query(`
+        SELECT tags.title FROM tags
+        INNER JOIN itemtags
+        ON itemtags.tagid = tags.id
+        WHERE itemtags.itemid = ${id}`
     )
 }
 
-export function getFilteredItems(tagId) {
-    return pool.query(`SELECT * FROM items
-                    INNER JOIN itemtags
-                    ON items.itemid = itemtags.tagid
-                    WHERE itemtags.tagid = ${tagId}`
+export function getItemsFromTags(id) {
+    return pool.query(`
+        SELECT * FOR items
+        INNER JOIN itemtags
+        ON itemstags.itemid = item.idtags
+        WHERE itemtags.tagid = ${id}`
     )
 }
 
@@ -89,7 +93,7 @@ export function createUser(args, context) {
                 password: args.password
             })
             const query = {
-                text: 'INSERT INTO user_profiles(fullname, bio, userid) VALUES($1, $2, $3) RETURNING *',
+                text: 'INSERT INTO user_profiles(fullname, bio, id) VALUES($1, $2, $3) RETURNING *',
                 values: [args.fullname, args.bio, fbuser.uid],
             }
             let pgUser = await pool.query(query)
@@ -101,14 +105,28 @@ export function createUser(args, context) {
         }
     })
 };
+// TODO: New Item
+export function newItem(args, context) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const itemQuery = {
+                text: `INSERT INTO items(title, description, imageurl, itemowner) VALUES($1, $2, $3, $4) RETURNING *`,
+                values: [args.title, args.description, args.imageurl, args.itemowner],
+            }
+            const newItem = await pool.query(itemQuery)
+            function insertTag(tags) {
+                return tags.map(tag => {
+                    return `(${newItem.rows[0].id}, ${tag.id})`
+                }).join(',')
+            }
 
-
-
-
-function renameId(item) {
-    return rows.map((row) => Object.keys(row)((acc, usr) => {
-        acc = { ...row, id: row.userid }
-        delete acc.userid;
-        return acc
-    })), {};
+            const tagQuery = {
+                text: `INSERT INTO itemtags(itemid, tagid) VALUES ${insertTag(args.tags)}`
+            }
+            const tags = await pool.query(tagQuery)
+            resolve({ id: newItem.rows[0].id })
+        } catch (error) {
+            reject(error)
+        }
+    })
 }

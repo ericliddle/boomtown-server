@@ -27,7 +27,7 @@ import fetch from 'node-fetch';
 // };
 
 export function getItemsShared(user) {
-    return fetch(`http://localhost:3001/items/?itemOwner=${user}`)
+    return fetch(`http://localhost:3001/items/?itemowner=${user}`)
         .then(response => response.json())
         .catch(errors => console.log(errors));
 };
@@ -37,11 +37,11 @@ export function getBorrowed(user) {
         .catch(errors => console.log(errors));
 };
 
-export function addNewItem(root, args) {
+export function addItem(root, args) {
     const newItem = {
         title: args.title,
-        imageUrl: args.imageUrl,
-        itemOwner: args.itemOwner,
+        imageurl: args.imageurl,
+        itemowner: args.itemowner,
         description: args.description,
         tags: args.tags,
         created: Math.floor(Date.now() / 1000),

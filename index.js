@@ -5,6 +5,7 @@ import {
     graphqlExpress,
     graphiqlExpress
 } from 'graphql-server-express';
+import firebaseAuthMiddleware from './api/middleware';
 import cors from 'cors';
 import schema from './api/schema';
 import createLoaders from './api/loaders';
@@ -19,12 +20,14 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(root))
     app.use(fallback('index.html', { root }))
 } else {
-    // app.use('*', cors({ origin: 'http://localhost3000' }));
+    app.use('*', cors({ origin: 'http://localhost3000' }));
 }
 
 app.use('*', cors());
 
 app.use(bodyParser.json());
+
+app.use('/graphql', firebaseAuthMiddleware);
 
 app.use('/graphql', graphqlExpress(function (req, res, next) {
     return {
@@ -36,6 +39,8 @@ app.use('/graphql', graphqlExpress(function (req, res, next) {
     }
 }));
 console.log(process.env)
+
+
 
 app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql'
