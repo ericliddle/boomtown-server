@@ -4,8 +4,7 @@ function firebaseAuthMiddleware(req, res, next) {
     if (process.env.NODE_ENV === 'development' && req.headers.origin === "http://localhost:4400"){ return next() };
     const authorization = req.header('Authorization');
     if (authorization) {
-        let token = authorization.split(' ');
-        admin.auth().verifyIdToken(token[1])
+        admin.auth().verifyIdToken(authorization)
             .then((decodedToken) => {
                 res.locals.user = decodedToken;
                 next();

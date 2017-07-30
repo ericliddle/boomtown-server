@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(root))
     app.use(fallback('index.html', { root }))
 } else {
-    app.use('*', cors({ origin: 'http://localhost3000' }));
+    // app.use('*', cors({ origin: 'http://localhost3000' }));
 }
 
 app.use('*', cors());
@@ -33,12 +33,11 @@ app.use('/graphql', graphqlExpress(function (req, res, next) {
     return {
         schema,
         context:
-        {
+    {
             loaders: createLoaders(),
         }
     }
 }));
-console.log(process.env)
 
 
 

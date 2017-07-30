@@ -11,32 +11,41 @@ export function getItems() {
 };
 
 export function getItem(id) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let item = await pool.query(`SELECT * FROM items WHERE id = '${id}'`)
-            item = (item.rows)[0];
-            resolve(item);
-        } catch (error) {
-            console.log(error);
-            reject(error);
-        }
-    })
+    return pool.query(`SELECT * FROM items WHERE id = '${id}'`)
+        .then(response => {
+            return response.rows[0]
+        }).catch(errors => console.log(errors))
 };
+
+// TODO: might not need below function
+// export function getItem(id) {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             let item = await pool.query(`SELECT * FROM items WHERE id = '${id}'`)
+//             item = (item.rows)[0];
+//             resolve(item);
+//         } catch (error) {
+//             console.log(error);
+//             reject(error);
+//         }
+//     })
+// };
 
 export const getUsers = () => {
     return pool.query(`SELECT * from user_profiles`)
         .then(response => {
-            return response.rows;
+            return response.rows
         }).catch(errors => console.log(errors))
 }
 
-export function getUser(id) {
+export const getUser = (id) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let user = await pool.query(`SELECT * FROM user_profiles WHERE id = ${id}`)
-            const fbuser = await admin.auth().gerUser(id)
+            let user = await pool.query(`SELECT * FROM user_profiles WHERE id='${id}'`)
+            const fbuser = await admin.auth().getUser(id)
+            user = user.rows[0]
             user = { ...user, email: fbuser.email };
-            resolve(user);
+            resolve(user)
         } catch (error) {
             console.log(error);
             reject(error);
@@ -45,7 +54,7 @@ export function getUser(id) {
 };
 
 export function getItemsShared(id) {
-    return pool.query(`SELECT * from items WHERE itemowner = '${id}'`)
+    return pool.query(`SELECT * from items WHERE itemowner='${id}'`)
         .then(response => {
             return response.rows
         }).catch(errors => console.log(errors));
@@ -53,11 +62,11 @@ export function getItemsShared(id) {
 
 
 export function getBorrowed(id) {
-    return pool.query(`SELECT * from items WHERE borrower= ${id}`)
+    return pool.query(`SELECT * from items WHERE borrower='${id}'`)
         .then(response => {
             return response.rows
         }).catch(errors => console.log(errors));
-};
+}
 
 export function getTags() {
     return pool.query(`SELECT * FROM tags`)
@@ -67,21 +76,23 @@ export function getTags() {
 
 export function getTagsFromItem(id) {
     return pool.query(`
-        SELECT tags.title FROM tags
+        SELECT * FROM tags
         INNER JOIN itemtags
-        ON itemtags.tagid = tags.id
-        WHERE itemtags.itemid = ${id}`
-    )
+        ON tags.id = itemtags.tagid
+        WHERE itemtags.itemid=${id}`
+    ).then(response => { return response.rows })
+        .catch(errors => console.log(errors));
 }
 
 export function getItemsFromTags(id) {
     return pool.query(`
         SELECT * FOR items
         INNER JOIN itemtags
-        ON itemstags.itemid = item.idtags
-        WHERE itemtags.tagid = ${id}`
-    )
-}
+        ON itemtags.itemid = items.id
+        WHERE itemtags.tagid=${id}`
+    ).then(response => { return response.rows })
+        .catch(errors => console.log(errors));
+};
 
 // WRITE HELPERS
 

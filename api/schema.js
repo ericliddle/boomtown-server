@@ -1,8 +1,6 @@
 import { makeExecutableSchema } from 'graphql-tools';
 import resolvers from './resolvers'
 
-// TODO: Add date string of time date + time in mutation
-
 const typeDefs = `
 
     type Item {
@@ -12,7 +10,7 @@ const typeDefs = `
         imageurl: String
         tags: [Tag!]
         itemowner: User!
-        created: Int!        
+        created: String!        
         available: Boolean!
         borrower: User
     }

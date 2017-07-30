@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import pool from '../database/index';
 import {
-    getUser, getUsers, newItem, getItem,
+    getUsers, newItem, getItem,
     getItems, getItemsShared, getBorrowed,
     createUser, getTags, getTagsFromItem,
     getItemsFromTags,
@@ -25,12 +25,17 @@ const resolveFunctions = {
     },
 
     Item: {
-        tags: (item) => {
-        return getTagsFromItem(item.id);
+        
+        tags: (item, { }, context) => {
+            return getTagsFromItem(item.id);
         },
 
+        // tags: (item) => {
+        // return getTagsFromItem(item.id);
+        // },
+
         itemowner(item, args, context) {
-            return context.loader.getUser.load(item.itemowner)
+            return context.loaders.getUser.load(item.itemowner)
         },
         borrower(item) {
             if (!item.borrower) return null

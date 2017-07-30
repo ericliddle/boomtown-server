@@ -1,6 +1,5 @@
 import DataLoader from 'dataloader';
-import { getItemsShared, getBorrowed, getItem } from './jsonServer';
-import { getUser } from './postgresDB';
+import { getItemsShared, getBorrowed, getItem, getUser } from './postgresDB';
 
 export default function () {
     return {
