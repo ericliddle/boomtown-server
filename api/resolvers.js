@@ -25,7 +25,7 @@ const resolveFunctions = {
     },
 
     Item: {
-        
+
         tags: (item, { }, context) => {
             return getTagsFromItem(item.id);
         },
@@ -48,7 +48,7 @@ const resolveFunctions = {
             return context.loaders.getItemsShared.load(user.id)
         },
         borrowed: (user, args, context) => {
-            return context.loaders.getBorrowed.load(id)
+            return context.loaders.getBorrowed.load(user.id)
         }
     },
 

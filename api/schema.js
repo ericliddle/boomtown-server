@@ -11,7 +11,6 @@ const typeDefs = `
         tags: [Tag!]
         itemowner: User!
         created: String!        
-        available: Boolean!
         borrower: User
     }
 
